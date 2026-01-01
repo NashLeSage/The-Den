@@ -1,56 +1,1116 @@
+/* =========================
+   Base / Reset
+========================= */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
+    Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #0f1113;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Theme tokens */
+  --bg: #0f1113;
+  --card: #1a1d20;
+  --panel: rgba(255, 255, 255, 0.03);
+  --border: #2a2f34;
+  --btn: #2a2f34;
+  --text: #e5e5e5;
+  --muted: #999;
+  --blue: #3b5cff;
+  --amber: #c46a1a;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* GLOBAL: prevent width+padding overflow */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
+
+/* =========================
+   Layout
+========================= */
+
+.den {
+  padding: 16px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.den-header h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.den-header button {
+  margin-bottom: 10px;
+}
+
+.den-header p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.den-header-logo {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+/* =========================
+   Card design including the background images
+========================= */
+
+.card {
+  position: relative;
+  overflow: hidden;
+  background: rgba(20, 22, 25, 0.94);
+  border-radius: 18px;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.card-morning {
+  background-image:
+    linear-gradient(rgba(12, 14, 16, 0.50),
+      rgba(12, 14, 16, 0.92)),
+    url("/Back_Morning.webp");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.card-edge {
+  background-image:
+    linear-gradient(rgba(12, 14, 16, 0.70),
+      rgba(12, 14, 16, 0.94)),
+    url("/Back_Edge.webp");
+
+  background-size: cover;
+  background-position: center;
+}
+
+.card-gym {
+  background-image:
+    linear-gradient(rgba(12, 14, 16, 0.70),
+      rgba(12, 14, 16, 0.96)),
+    url("/Back_Gym.webp");
+
+  background-size: cover;
+  background-position: center;
+}
+
+/* =========================
+   Buttons (global)
+========================= */
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border-radius: 12px;
+  border: none;
+  background: var(--btn);
+  color: #fff;
+  font-size: 16px;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+button:hover {
+  filter: brightness(1.06);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button:disabled:hover {
+  filter: none;
+}
+
+/* Primary buttons */
+button.primary {
+  background: var(--blue);
+}
+
+button.primary.edge {
+  background: var(--blue);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+button.primary.gym {
+  background: var(--amber);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.25);
+}
+
+button.danger {
+  background: #5b2323;
+}
+
+.danger-outline {
+  border: 1px solid rgba(255, 90, 90, 0.85);
+  box-shadow: 0 0 0 2px rgba(255, 90, 90, 0.18);
+}
+
+button.success {
+  background: #244a2e;
+  color: #e5ffe8;
+}
+
+button.cancel {
+  background: #1e2327;
+  color: #9aa0a6;
+  border: 1px solid var(--border);
+}
+
+button.cancel:hover {
+  background: #242a2f;
+  color: #cfd3d7;
+}
+
+/* Hold-to-cancel fill */
+button.hold-cancel {
+  background: #1e2327;
+  color: #9aa0a6;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  --p: 0;
+}
+
+button.hold-cancel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right,
+      rgba(59, 92, 255, 0.55),
+      rgba(59, 92, 255, 0.25));
+  transform: translateX(calc((-100%) + (var(--p) * 100%)));
+  transition: transform 0.05s linear;
+}
+
+button.hold-cancel>* {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   Threshold button flash (red pulse)
+========================= */
+
+.threshold-btn {
+  transition: background-color 220ms ease, box-shadow 220ms ease, transform 120ms ease;
+}
+
+.threshold-btn.threshold-flash {
+  background-color: #7a1f1f;
+  box-shadow: 0 0 18px rgba(180, 40, 40, 0.45);
+  transform: scale(0.98);
+}
+
+/* =========================
+   Header rows (FIX)
+   Keeps Edit/View buttons top-right instead of dropping below.
+========================= */
+
+.mc-head,
+.mc-header-row,
+.timeline-details-head,
+.badge-modal-head,
+.badge-modal-top,
+.insights-daybar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+/* Small action buttons inside header rows */
+.mc-head button,
+.mc-header-row button,
+.timeline-details-head button,
+.badge-modal-head button,
+.badge-modal-top button,
+.insights-daybar button {
+  width: auto !important;
+  margin-top: 0 !important;
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.10) !important;
+}
+
+/* If any header action is a link styled as a button */
+.mc-head a,
+.timeline-details-head a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* =========================
+   Morning Check-In (tile)
+========================= */
+
+button.mc-header.mc-tile {
+  margin-top: 0;
+  padding: 0;
+  border-radius: 12px;
+
+  background: transparent;
+  /* 🔥 key change */
+  border: none;
+  /* 🔥 key change */
+  box-shadow: none;
+  filter: none;
+
+  width: 100%;
+}
+
+button.mc-header.mc-tile:hover {
+  filter: none;
+  background: transparent;
+}
+
+button.mc-header.mc-tile:active {
+  transform: scale(0.99);
+}
+
+/* Morning Check-In header row (NEW) */
+.mc-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  padding: 14px 12px;
+  border-radius: 14px;
+
+  background: rgba(0, 0, 0, 0.35);
+  /* soft glass over image */
+}
+
+/* Left text block */
+.mc-header-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* inner layout */
+.mc-header-inner {
+  padding: 14px 12px;
+  text-align: center;
+}
+
+.mc-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  text-align: left;
+  /* add this */
+}
+
+.mc-sub {
+  margin-top: 2px;
+  font-size: 13px;
+  opacity: 0.75;
+  text-align: left;
+  /* add this */
+}
+
+/* ---- Morning journal bubble ---- */
+.journal-bubble {
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.journal-input {
+  width: 100%;
+  resize: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.35;
+}
+
+.journal-input::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.journal-hint {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+/* =========================
+   Labels / Mini Stats
+========================= */
+
+.label {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #cfcfcf;
+  font-size: 14px;
+}
+
+.val {
+  color: var(--text);
+}
+
+.mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  color: #b7b7b7;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.mini-label {
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.mini-value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
+.sessions {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 900px) {
+  .sessions {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
   }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+/* =========================
+   Sliders / Range Inputs
+========================= */
+
+input[type="range"] {
+  width: 100%;
+  margin: 12px 0 20px;
+  padding: 6px 0;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+input[type="range"]::-moz-range-track {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  margin-top: -9px;
+  box-shadow: 0 0 0 4px rgba(79, 99, 255, 0.35);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 0 0 4px rgba(79, 99, 255, 0.35);
+}
+
+/* =========================
+   Chips
+========================= */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+/* Many of your chips are <button class="chip">... */
+button.chip,
+.chip {
+  width: auto;
+  margin-top: 0;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--text);
+  font-size: 14px;
+}
+
+.chip-on {
+  background: var(--blue) !important;
+}
+
+/* =========================
+   Badges (grid + images)
+========================= */
+
+.badges-wrap {
+  margin-top: 10px;
+}
+
+.badge-grid {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.badge-grid-iron {
+  grid-template-columns: 1fr;
+}
+
+.badge-item {
+  width: 100% !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 16px;
+}
+
+.badge-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.badge-item.off .badge-img,
+.badge-img.locked {
+  filter: grayscale(1) brightness(0.65);
+  opacity: 0.75;
+}
+
+.badge-item.on .badge-img {
+  filter: none;
+  opacity: 1;
+  border-color: var(--blue);
+  box-shadow: 0 0 0 1px rgba(59, 92, 255, 0.35);
+}
+
+.badge-iron .badge-img {
+  max-width: 200px;
+  margin: 0 auto;
+}
+
+/* =========================
+   Rest / Misc
+========================= */
+
+.mw-block {
+  margin: 16px 0 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mw-title {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 8px;
+  letter-spacing: 0.2px;
+}
+
+.nice {
+  margin-left: auto;
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  background: rgba(60, 255, 120, 0.12);
+  border: 1px solid rgba(60, 255, 120, 0.22);
+  color: #bfffd3;
+}
+
+/* =========================
+   Today’s Log – Semantic Borders
+========================= */
+
+.log-list {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+}
+
+.log-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 4px solid transparent;
+  transition: border-color 120ms ease, background 120ms ease;
+}
+
+.log-time {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.log.edge.start {
+  border-left-color: var(--blue);
+}
+
+.log.edge.end {
+  border-left-color: #8b1e1e;
+}
+
+.log.gym.start {
+  border-left-color: var(--amber);
+  background: rgba(196, 106, 26, 0.08);
+}
+
+.log.gym.end {
+  border-left-color: var(--amber);
+}
+
+/* =========================
+   Insights Timeline (RESTORED)
+========================= */
+
+.timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 8px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #cfcfcf;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;
+  display: inline-block;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.legend-swatch.edge {
+  background: rgba(155, 70, 170, 0.6);
+}
+
+.legend-swatch.gym {
+  background: rgba(50, 170, 110, 0.6);
+}
+
+.legend-swatch.supp {
+  background: var(--blue);
+}
+
+.legend-swatch.alc {
+  background: #a35b2b;
+}
+
+.legend-star {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+}
+
+.legend-lock {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.timeline {
+  position: relative;
+  width: 1440px;
+  height: 120px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* timeline items are buttons, do NOT let global button styles ruin them */
+button.timeline-block,
+button.timeline-point {
+  width: auto;
+  margin-top: 0 !important;
+}
+
+button.timeline-block {
+  position: absolute;
+  top: 22px;
+  height: 54px;
+  border-radius: 12px;
+  padding: 4px 6px !important;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  text-align: center;
+
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+button.timeline-block[data-short="1"] {
+  padding: 0 !important;
+  font-size: 0;
+}
+
+button.timeline-block.edge {
+  background: rgba(155, 70, 170, 0.35);
+}
+
+button.timeline-block.gym {
+  background: rgba(50, 170, 110, 0.28);
+}
+
+button.timeline-point {
+  position: absolute;
+  top: 18px;
+  width: 12px !important;
+  height: 12px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+  opacity: 0.95;
+
+  border: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 0 0 10px rgba(255, 255, 255, 0.06);
+}
+
+button.timeline-point.supp {
+  background: var(--blue) !important;
+}
+
+button.timeline-point.alc {
+  background: #a35b2b !important;
+}
+
+button.timeline-point:active,
+button.timeline-block:active {
+  transform: scale(0.98);
+}
+
+button.timeline-block:focus,
+button.timeline-point:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.25);
+  outline-offset: 2px;
+}
+
+.timeline-details {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+.timeline-details-title {
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+.timeline-details-body {
+  margin-top: 8px;
+}
+
+.timeline-pre {
+  margin: 10px 0 0;
+  padding: 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  white-space: pre-wrap;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+button.timeline-release {
+  position: absolute;
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+
+  font-size: 18px;
+  line-height: 1;
+
+  transform: translateX(-50%);
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+button.timeline-release:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+/* ⭐ / 🔒 Edge outcome markers (same “shape” rules as timeline-release) */
+button.timeline-edge-outcome {
+  position: absolute;
+
+  width: auto !important;
+  height: auto !important;
+  padding: 0 !important;
+  margin-top: 0 !important;
+
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+
+  font-size: 16px;
+  line-height: 1;
+
+  transform: translateX(-50%);
+  /* center marker on its timestamp */
+  cursor: pointer;
+  opacity: 0.95;
+}
+
+button.timeline-edge-outcome:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+button.timeline-edge-outcome.lock {
+  opacity: 0.85;
+}
+
+button.timeline-edge-outcome.release {
+  opacity: 1;
+}
+
+/* Hour markers */
+.tl-hours {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 40px;
+  pointer-events: none;
+}
+
+.tl-hour {
+  position: absolute;
+  top: 0;
+  transform: translateX(-1px);
+}
+
+.tl-hour-line {
+  height: 120px;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tl-hour-label {
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
+  font-variant-numeric: tabular-nums;
+}
+
+.tl-empty-hint {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+/* =========================
+   Disclaimer
+========================= */
+
+.disclaimer {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.disclaimer-title {
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  margin-bottom: 6px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.disclaimer-text {
+  font-size: 13px;
+  line-height: 1.45;
+  opacity: 0.75;
+}
+
+/* =========================
+   Badge Modal
+========================= */
+
+.badge-modal-backdrop,
+.badge-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  padding-top: calc(16px + env(safe-area-inset-top));
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+.badge-modal-card,
+.badge-modal {
+  width: min(420px, 96vw);
+  max-height: calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 18px 70px rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: column;
+}
+
+.badge-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 14px 14px;
+}
+
+.badge-modal-img {
+  width: 100%;
+  height: auto;
+  max-height: 42dvh;
+  object-fit: contain;
+  display: block;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.badge-rules,
+.badge-rule,
+.badge-modal-title,
+.badge-modal-sub,
+.badge-name,
+.badge-sub {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.badge-rules {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+}
+
+.badge-modal-actions {
+  flex: 0 0 auto;
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* =========================
+   Edge Ritual modal (mobile width fix)
+   ========================= */
+
+/* Overlay: never causes horizontal scroll */
+.edgeRitualModalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding:
+    calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
+
+  background: rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+  /* important: overlay itself never scrolls sideways */
+}
+
+/* The modal card: hard cap width + correct box sizing */
+.edgeRitualModal {
+  width: 100%;
+  max-width: min(520px, 100%);
+  /* desktop cap + never exceed viewport */
+  box-sizing: border-box;
+  margin: 0;
+  border-radius: 18px;
+}
+
+/* Modal inner content area: allow vertical scroll, forbid horizontal */
+.edgeRitualModal .modalBody,
+.edgeRitualModal .content,
+.edgeRitualModal .cardContent {
+  max-height: min(70vh, 560px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Defensive: any long text / chips / inputs can’t push width */
+.edgeRitualModal * {
+  box-sizing: border-box;
+}
+
+.edgeRitualModal p,
+.edgeRitualModal label,
+.edgeRitualModal .chips,
+.edgeRitualModal .row {
+  max-width: 100%;
+}
+
+.edgeRitualModal input,
+.edgeRitualModal textarea,
+.edgeRitualModal select {
+  width: 100%;
+  max-width: 100%;
+}
+
+/* =========================
+Supplements Grid 
+========================= */
+/* Grid stays the same */
+.supp-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Tile */
+.supp-tile {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 8px 10px;
+  border-radius: 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.92);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  text-align: center;
+}
+
+/* Active */
+.supp-on {
+  border-color: rgba(59, 92, 255, 0.45);
+  background: rgba(59, 92, 255, 0.10);
+}
+
+/* Label */
+.supp-label {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.15;
+  opacity: 0.95;
+
+  /* allow clean wrapping */
+  word-break: break-word;
+}
+
+/* Count */
+.supp-value {
+  font-size: 14px;
+  font-weight: 900;
+  opacity: 0.45;
+}
+
+.supp-value-on {
+  opacity: 1;
+  color: rgb(120, 140, 255);
+}
+
+.supp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.supp-footer .chip {
+  width: auto;
+  /* overrides global button { width: 100% } */
 }

@@ -7,6 +7,8 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5000,
-    allowedHosts: 'all'
+    allowedHosts: [
+      'c1ff1cdd-574e-4558-aed1-a6ccd6574e51-00-3doid22vbf9af.kirk.replit.dev'
+    ]
   }
 })

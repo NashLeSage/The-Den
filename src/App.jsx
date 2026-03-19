@@ -227,7 +227,7 @@ export default function App() {
     <div className="den">
       <header className="den-header">
         <img
-          src="/TheDen.webp"
+          src={`${import.meta.env.BASE_URL}TheDen.webp`}
           alt="The Den – Masculinity Unlocked"
           className="den-header-logo"
         />

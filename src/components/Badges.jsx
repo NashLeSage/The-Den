@@ -7,7 +7,7 @@ const BADGE_DEFS = [
   {
     key: "anchor",
     title: "Check-In Anchor",
-    img: "/badges/01_Anchor.webp",
+    img: `${import.meta.env.BASE_URL}badges/01_Anchor.webp`,
     rules: [
       "Unlocked if 5 of the last 7 days have Morning Check-In marked Done.",
     ],
@@ -15,19 +15,19 @@ const BADGE_DEFS = [
   {
     key: "body",
     title: "Body Mover",
-    img: "/badges/02_Body.webp",
+    img: `${import.meta.env.BASE_URL}badges/02_Body.webp`,
     rules: ["Unlocked if gym sessions were logged on 3 of the last 7 days."],
   },
   {
     key: "explorer",
     title: "Edge Explorer",
-    img: "/badges/03_Explorer.webp",
+    img: `${import.meta.env.BASE_URL}badges/03_Explorer.webp`,
     rules: ["Unlocked if edge sessions were logged on 5 of the last 7 days."],
   },
   {
     key: "integratedWolf",
     title: "Integrated Wolf",
-    img: "/badges/04_Wolf.webp",
+    img: `${import.meta.env.BASE_URL}badges/04_Wolf.webp`,
     rules: [
       "Unlocked when ALL of the following are true, within the last 7 days:",
       "7/7 days Morning Check-In marked Done",
@@ -41,7 +41,7 @@ const BADGE_DEFS = [
 const IRON = {
   key: "ironWolf",
   title: "The Iron Wolf: Alpha Week",
-  img: "/badges/05_IronWolf.webp",
+  img: `${import.meta.env.BASE_URL}badges/05_IronWolf.webp`,
   rules: [
     "All Integrated Wolf rules, PLUS:",
     "Morning Wood = Yes on 5+ of the last 7 days",

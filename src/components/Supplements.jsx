@@ -5,23 +5,22 @@ function todayKey() {
   return localDayKey();
 }
 
-const SUPPS = [
-  "5-HTP",
-  "B12",
-  "Creatine",
-  "L-Arginine",
-  "Magnesium",
-  "Multi-vit",
-  "Protein",
-  "Shilajit",
-  "Silimarin",
-  "Zinc",
-  "Other",
-];
+function uid() {
+  return Math.random().toString(36).slice(2, 10);
+}
+
+const MAX_SUPPLEMENTS = 10;
 
 export default function Supplements({ store, setStore }) {
   const today = todayKey();
   const [isEditing, setIsEditing] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newDose, setNewDose] = useState("");
+
+  const supplements = store.supplements ?? [];
 
   const todaysEvents = useMemo(() => {
     return (store.events || []).filter(
@@ -29,17 +28,18 @@ export default function Supplements({ store, setStore }) {
     );
   }, [store.events, today]);
 
-  const counts = useMemo(() => {
+  const countsById = useMemo(() => {
     return todaysEvents.reduce((acc, e) => {
-      const name = e?.value?.name;
-      if (!name) return acc;
-      acc[name] = (acc[name] || 0) + 1;
+      const id = e?.value?.supplementId;
+      if (!id) return acc;
+      acc[id] = (acc[id] || 0) + 1;
       return acc;
     }, {});
   }, [todaysEvents]);
 
-  function logSupp(name) {
+  function logSupp(supp) {
     const now = Date.now();
+
     setStore((prev) => ({
       ...prev,
       events: [
@@ -48,7 +48,11 @@ export default function Supplements({ store, setStore }) {
           type: "supp_taken",
           ts: now,
           day: today,
-          value: { name },
+          value: {
+            supplementId: supp.id,
+            name: supp.name,
+            dose: supp.dose,
+          },
           sessionId: null,
         },
       ],
@@ -67,52 +71,191 @@ export default function Supplements({ store, setStore }) {
     });
   }
 
+  function addSupplement() {
+    const name = newName.trim();
+    const dose = newDose.trim();
+
+    if (!name || !dose) return;
+    if (supplements.length >= MAX_SUPPLEMENTS) return;
+
+    const nameLower = name.toLowerCase();
+    const doseLower = dose.toLowerCase();
+
+    const alreadyExists = supplements.some(
+      (s) =>
+        s.name.trim().toLowerCase() === nameLower &&
+        s.dose.trim().toLowerCase() === doseLower,
+    );
+
+    if (alreadyExists) {
+      alert("That supplement is already in your list.");
+      return;
+    }
+
+    const nextSupp = {
+      id: uid(),
+      name,
+      dose,
+    };
+
+    setStore((prev) => ({
+      ...prev,
+      supplements: [...(prev.supplements ?? []), nextSupp],
+    }));
+
+    setNewName("");
+    setNewDose("");
+    setIsAdding(false);
+  }
+
+  function removeSupplement(id) {
+    setStore((prev) => ({
+      ...prev,
+      supplements: (prev.supplements ?? []).filter((s) => s.id !== id),
+    }));
+  }
+
   return (
     <section className="card">
       <div className="mc-head">
         <h2>Supplements 💊</h2>
-        <button
-          type="button"
-          className="chip"
-          onClick={() => setIsEditing((v) => !v)}
-          style={{ width: "auto" }}
-        >
-          {isEditing ? "Done" : "Edit"}
-        </button>
+
+        <div className="supp-header-actions">
+          {isOpen && (
+            <button
+              type="button"
+              className="chip supp-header-btn"
+              onClick={() => {
+                setIsEditing((v) => !v);
+                setIsAdding(false);
+                setNewName("");
+                setNewDose("");
+              }}
+              aria-label={isEditing ? "Finish editing supplements" : "Edit supplements"}
+            >
+              {isEditing ? "Done" : "Edit"}
+            </button>
+          )}
+
+          <button
+            type="button"
+            className="chip supp-header-btn supp-toggle-btn"
+            onClick={() => {
+              if (isOpen) {
+                setIsEditing(false);
+                setIsAdding(false);
+                setNewName("");
+                setNewDose("");
+              }
+              setIsOpen((v) => !v);
+            }}
+            aria-label={isOpen ? "Collapse supplements" : "Expand supplements"}
+            title={isOpen ? "Hide supplements" : "Show supplements"}
+          >
+            <span className="supp-toggle-icon" aria-hidden="true">
+              {isOpen ? "^" : "˅"}
+            </span>
+          </button>
+        </div>
       </div>
 
-      {/* Collapsed summary */}
-      {!isEditing && (
+      {!isOpen ? (
+        <div className="muted">Tap ˅ to show your supplements.</div>
+      ) : !isEditing ? (
         <div className="muted">
           {todaysEvents.length
             ? `Today: ${todaysEvents.length}`
             : "No supplements logged today."}
         </div>
-      )}
+      ) : null}
 
-      {/* Expanded editor */}
-      {isEditing && (
+      {isOpen && isEditing && (
         <>
-          <div className="supp-grid">
-            {SUPPS.map((s) => {
-              const c = counts[s] || 0;
-              return (
-                <button
-                  key={s}
-                  type="button"
-                  className={`supp-tile ${counts[s] ? "supp-on" : ""}`}
-                  onClick={() => logSupp(s)}
-                >
-                  <div className="supp-label">{s}</div>
-                  <div
-                    className={`supp-value ${counts[s] ? "supp-value-on" : ""}`}
-                  >
-                    {counts[s] || 0}
-                  </div>
-                </button>
-              );
-            })}
+          <div className="supp-footer">
+            <div className="muted">
+              Tracked: <b>{supplements.length}</b> / {MAX_SUPPLEMENTS}
+            </div>
+
+            <button
+              type="button"
+              className="chip"
+              onClick={() => setIsAdding((v) => !v)}
+              disabled={supplements.length >= MAX_SUPPLEMENTS}
+              style={{ width: "auto" }}
+            >
+              {isAdding ? "Close" : "Add"}
+            </button>
           </div>
+
+          {isAdding && (
+            <div className="journal-bubble" style={{ marginTop: 12 }}>
+              <div className="subhead">Add supplement</div>
+
+              <input
+                type="text"
+                value={newName}
+                placeholder="Supplement name"
+                onChange={(e) => setNewName(e.target.value)}
+                style={{ marginTop: 10 }}
+              />
+
+              <input
+                type="text"
+                value={newDose}
+                placeholder="Dose (e.g. 5g, 300mg, 1 capsule)"
+                onChange={(e) => setNewDose(e.target.value)}
+                style={{ marginTop: 10 }}
+              />
+
+              <button type="button" className="primary" onClick={addSupplement}>
+                Save Supplement
+              </button>
+            </div>
+          )}
+
+          {!supplements.length ? (
+            <div className="muted" style={{ marginTop: 12 }}>
+              No supplements added yet.
+            </div>
+          ) : (
+            <div className="supp-grid">
+              {supplements.map((s) => {
+                const count = countsById[s.id] || 0;
+
+                return (
+                  <div key={s.id} className="supp-tile">
+                    <button
+                      type="button"
+                      className={`supp-tile ${count ? "supp-on" : ""}`}
+                      onClick={() => logSupp(s)}
+                    >
+                      <div className="supp-label">{s.name}</div>
+                      <div
+                        className="muted"
+                        style={{ fontSize: 12, lineHeight: 1.2 }}
+                      >
+                        {s.dose}
+                      </div>
+                      <div
+                        className={`supp-value ${count ? "supp-value-on" : ""}`}
+                      >
+                        {count}
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="chip"
+                      onClick={() => removeSupplement(s.id)}
+                      style={{ width: "100%", marginTop: 8 }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           <div className="supp-footer">
             <div className="muted">
@@ -130,6 +273,31 @@ export default function Supplements({ store, setStore }) {
             </button>
           </div>
         </>
+      )}
+
+      {isOpen && !isEditing && !!supplements.length && (
+        <div className="supp-grid" style={{ marginTop: 12 }}>
+          {supplements.map((s) => {
+            const count = countsById[s.id] || 0;
+
+            return (
+              <button
+                key={s.id}
+                type="button"
+                className={`supp-tile ${count ? "supp-on" : ""}`}
+                onClick={() => logSupp(s)}
+              >
+                <div className="supp-label">{s.name}</div>
+                <div className="muted" style={{ fontSize: 12, lineHeight: 1.2 }}>
+                  {s.dose}
+                </div>
+                <div className={`supp-value ${count ? "supp-value-on" : ""}`}>
+                  {count}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       )}
     </section>
   );

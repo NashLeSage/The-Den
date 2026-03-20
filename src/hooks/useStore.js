@@ -5,6 +5,7 @@ const KEY = "mu-den-v01";
 const EMPTY = {
   days: {},
   events: [],
+  supplements: [],
   activeSession: null,
   activeGymSession: null,
   prefs: {
@@ -23,9 +24,10 @@ function hydrate(saved) {
   // Merge defaults so missing keys never break components
   const s = saved && typeof saved === "object" ? saved : {};
   return {
-    ...EMPTY,
-    ...s,
-    prefs: { ...EMPTY.prefs, ...(s.prefs ?? {}) },
+  ...EMPTY,
+  ...s,
+  supplements: Array.isArray(s.supplements) ? s.supplements : [],
+  prefs: { ...EMPTY.prefs, ...(s.prefs ?? {}) },
     journals: {
       ...EMPTY.journals,
       ...(s.journals ?? {}),

@@ -245,7 +245,7 @@ button.hold-cancel>* {
 }
 
 /* Small action buttons inside header rows */
-.mc-head button,
+ .mc-head > button,
 .mc-header-row button,
 .timeline-details-head button,
 .badge-modal-head button,
@@ -266,6 +266,33 @@ button.hold-cancel>* {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+.supp-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.supp-header-btn {
+  width: auto !important;
+  margin-top: 0 !important;
+}
+
+.supp-toggle-btn {
+  min-width: 40px;
+  justify-content: center;
+  padding-left: 12px !important;
+  padding-right: 12px !important;
+}
+
+.supp-toggle-icon {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+  opacity: 0.9;
 }
 
 /* =========================

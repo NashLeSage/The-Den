@@ -19,8 +19,11 @@ function fmtDur(sec) {
 
 function labelFor(e) {
   switch (e.type) {
-    case "supp_taken":
-      return `Supp: ${e.value?.name ?? "Unknown"}`;
+    case "supp_taken": {
+      const name = e.value?.name ?? "Unknown";
+      const dose = e.value?.dose?.trim?.() ?? "";
+      return dose ? `Supp: ${name} (${dose})` : `Supp: ${name}`;
+    }
     case "alc_drink":
       return `Alcohol: ${e.value?.label ?? "Drink"}`;
 

@@ -81,6 +81,31 @@ function fmtNum(n) {
   return String(Math.round(n * 10) / 10);
 }
 
+function hasMeaningfulEntry(entry) {
+  if (!entry || typeof entry !== "object") return false;
+  return [entry.restore, entry.quality, entry.stress, entry.libido].some(
+    (v) => clampNum(v) != null,
+  ) || parseMW(entry.morningWood) != null;
+}
+
+function buildEarlyWeekNote({ activeDayCount, signalCount, momentCount }) {
+  if (activeDayCount >= 4) return null;
+
+  if (activeDayCount <= 1) {
+    return "The week is only just getting its boots on. Log a few more days and come back for a stronger read.";
+  }
+
+  if (activeDayCount === 2) {
+    return "The week is still taking shape. You’ve got enough here for a light read, but the stronger patterns usually show themselves after a few more days.";
+  }
+
+  if (activeDayCount === 3 && signalCount === 0 && momentCount === 0) {
+    return "There’s a decent start here, but it’s still a bit early to trust the deeper patterns. Give the week a little more time to speak.";
+  }
+
+  return null;
+}
+
 // ✅ Support both shapes:
 // - days[dayKey] = { restore, quality, ... }
 // - days[dayKey] = { entry: { restore, quality, ... }, ... }
@@ -218,6 +243,17 @@ export function deriveWeeklyInsights(payload, weekStartDayKey) {
     .filter((e) => e?.type === "alc_drink" && weekKeySet.has(e?.day))
     .slice()
     .sort((a, b) => (a.ts ?? 0) - (b.ts ?? 0));
+
+  const weekEvents = events.filter((e) => weekKeySet.has(e?.day));
+  const eventDaySet = new Set(weekEvents.map((e) => e.day).filter(Boolean));
+
+  const activeDayCount = weekKeys.filter((k) => {
+    const entry = getDayEntry(days, k);
+    const hasEntry = hasMeaningfulEntry(entry);
+    const hasEvent = eventDaySet.has(k);
+    const hasMorningJournal = Boolean((journals?.morningByDay?.[k] ?? "").trim());
+    return hasEntry || hasEvent || hasMorningJournal;
+  }).length;
 
   // Edge totals
   const edgeTotalSec = edgeEnds
@@ -535,6 +571,12 @@ export function deriveWeeklyInsights(payload, weekStartDayKey) {
     .slice(0, 3)
     .map(({ _rank, _ts, ...rest }) => rest);
 
+  const earlyWeekNote = buildEarlyWeekNote({
+    activeDayCount,
+    signalCount: pickedSignals.length,
+    momentCount: pickedMoments.length,
+  });
+
   // -------- Summary --------
   const summary = {
     weekStartKey,
@@ -572,5 +614,7 @@ export function deriveWeeklyInsights(payload, weekStartDayKey) {
     signals: pickedSignals,
     moments: pickedMoments,
     alcoholSleepNote, // ✅ only set when negative pattern detected
+    earlyWeekNote,
+    activeDayCount,
   };
 }

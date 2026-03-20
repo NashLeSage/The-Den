@@ -43,10 +43,13 @@ export function deriveDailyTimeline(events, dayKey = localDayKey()) {
   // Point events (supp + alcohol)
   for (const e of dayEvents) {
     if (e.type === "supp_taken") {
+      const name = e.value?.name ?? "Supplement";
+      const dose = e.value?.dose?.trim?.() ?? "";
+
       points.push({
         kind: "supp",
         ts: e.ts,
-        label: e.value?.name ?? "Supplement",
+        label: dose ? `${name} (${dose})` : name,
       });
     }
     if (e.type === "alc_drink") {

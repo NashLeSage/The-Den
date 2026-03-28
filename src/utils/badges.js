@@ -34,6 +34,23 @@ function isNonEmptyString(s) {
   return typeof s === "string" && s.trim().length > 0;
 }
 
+function hasMeaningfulMorningCheckin(store, dayKey) {
+  const entry = store.days?.[dayKey] ?? null;
+  const morningJournal = store.journals?.morningByDay?.[dayKey] ?? "";
+
+  const hasMetrics =
+    entry &&
+    (
+      Number(entry.restore ?? 0) > 0 ||
+      Number(entry.quality ?? 0) > 0 ||
+      Number(entry.libido ?? 0) > 0 ||
+      Number(entry.stress ?? 0) > 0 ||
+      typeof entry.morningWood === "boolean"
+    );
+
+  return hasMetrics || isNonEmptyString(morningJournal);
+}
+
 function uniq(arr) {
   return Array.from(new Set(arr));
 }
@@ -53,7 +70,9 @@ function daysWithEventType(events, windowDays, type) {
 
 function countDoneCheckins(store, windowDays) {
   const doneMap = store.journals?.morningDoneByDay ?? {};
-  const doneDays = windowDays.filter((d) => doneMap[d] === true);
+  const doneDays = windowDays.filter(
+    (d) => doneMap[d] === true || hasMeaningfulMorningCheckin(store, d),
+  );
   return { count: doneDays.length, days: doneDays };
 }
 

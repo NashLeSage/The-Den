@@ -42,6 +42,7 @@ export default function App() {
     const payload = {
       days: store.days,
       events: store.events,
+      supplements: store.supplements ?? [],
       prefs: store.prefs ?? { wolfSound: false, wolfVibe: true },
       activeSession: store.activeSession ?? null,
       activeGymSession: store.activeGymSession ?? null,
@@ -119,6 +120,29 @@ export default function App() {
       };
     }
 
+    // ✅ Merge supplements library (dedupe by id first, then name+dose)
+    const curSupps = Array.isArray(cur.supplements) ? cur.supplements : [];
+    const impSupps = Array.isArray(imp.supplements) ? imp.supplements : [];
+
+    const mergedSupps = [...curSupps];
+    const seenSuppIds = new Set(curSupps.map((s) => s?.id).filter(Boolean));
+    const seenSuppKeys = new Set(
+      curSupps.map((s) => `${String(s?.name ?? "").trim().toLowerCase()}|${String(s?.dose ?? "").trim().toLowerCase()}`),
+    );
+
+    for (const s of impSupps) {
+      const id = s?.id ?? null;
+      const key = `${String(s?.name ?? "").trim().toLowerCase()}|${String(s?.dose ?? "").trim().toLowerCase()}`;
+
+      if ((id && seenSuppIds.has(id)) || seenSuppKeys.has(key)) continue;
+
+      if (id) seenSuppIds.add(id);
+      seenSuppKeys.add(key);
+      mergedSupps.push(s);
+    }
+
+    next.supplements = mergedSupps;
+
     // ✅ Merge events with dedupe
     const curEvents = Array.isArray(cur.events) ? cur.events : [];
     const impEvents = Array.isArray(imp.events) ? imp.events : [];
@@ -172,6 +196,7 @@ export default function App() {
     next.prefs = { ...(cur.prefs ?? {}) };
     next.activeSession = cur.activeSession ?? null;
     next.activeGymSession = cur.activeGymSession ?? null;
+    if (!next.supplements) next.supplements = [...(cur.supplements ?? [])];
 
     // ✅ Meta bookkeeping
     next.meta = {
